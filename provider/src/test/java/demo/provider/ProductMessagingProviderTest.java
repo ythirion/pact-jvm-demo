@@ -41,10 +41,6 @@ public class ProductMessagingProviderTest {
 
     @PactVerifyProvider("a product creation event")
     public String verifyProductCreatedEvent() throws JsonProcessingException {
-        doNothing()
-                .when(eventPublisher)
-                .accept(eq(NEW_PRODUCTS), any(String.class));
-
         val productCreated = ProductCreated.builder()
                 .messageId(UUID.randomUUID())
                 .id("10")
@@ -54,8 +50,7 @@ public class ProductMessagingProviderTest {
         dispatcher.publishEvent(productCreated);
 
         val messageCapture = ArgumentCaptor.forClass(String.class);
-        verify(eventPublisher, times(1))
-                .accept(eq(NEW_PRODUCTS), messageCapture.capture());
+        verify(eventPublisher, times(1)).accept(eq(NEW_PRODUCTS), messageCapture.capture());
 
         return messageCapture.getValue();
     }
