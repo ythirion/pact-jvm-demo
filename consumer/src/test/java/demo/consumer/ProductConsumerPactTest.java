@@ -7,24 +7,40 @@ import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
+import lombok.val;
+import org.assertj.core.api.ThrowableAssert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArrayMinLike;
 import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith(PactConsumerTestExt.class)
-@PactTestFor(providerName = "product-api",pactVersion = PactSpecVersion.V3)
+@PactTestFor(pactVersion = PactSpecVersion.V3)
 class ProductConsumerPactTest {
 
     public static final String BEARER_REGEX = "Bearer (19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][1-9]|2[0123]):[0-5][0-9]";
+    private ProductService productService;
+
+    @BeforeEach
+    public void init(MockServer mockServer) {
+        RestTemplate restTemplate = new RestTemplateBuilder()
+                .rootUri(mockServer.getUrl())
+                .build();
+        productService = new ProductService(restTemplate);
+    }
 
     @Pact(consumer = "FrontendApplication", provider = "ProductService")
     RequestResponsePact getAllProducts(PactDslWithProvider builder) {
@@ -115,86 +131,64 @@ class ProductConsumerPactTest {
     @Test
     @PactTestFor(pactMethod = "getAllProducts")
     void getAllProducts_whenProductsExist(MockServer mockServer) {
-        Product product = new Product();
-        product.setId("09");
-        product.setType("CREDIT_CARD");
-        product.setName("Gem Visa");
-        List<Product> expected = Arrays.asList(product, product);
-
-        RestTemplate restTemplate = new RestTemplateBuilder()
-                .rootUri(mockServer.getUrl())
+        val product = Product.builder()
+                .id("09")
+                .type("CREDIT_CARD")
+                .name("Gem Visa")
                 .build();
-        List<Product> products = new ProductService(restTemplate).getAllProducts();
+        val products = productService.getAllProducts();
 
-        assertEquals(expected, products);
+        assertThat(products).isEqualTo(Arrays.asList(product, product));
     }
 
     @Test
     @PactTestFor(pactMethod = "noProductsExist")
     void getAllProducts_whenNoProductsExist(MockServer mockServer) {
-        RestTemplate restTemplate = new RestTemplateBuilder()
-                .rootUri(mockServer.getUrl())
-                .build();
-        List<Product> products = new ProductService(restTemplate).getAllProducts();
-
-        assertEquals(Collections.emptyList(), products);
+        val products = productService.getAllProducts();
+        assertThat(products).isEqualTo(Collections.emptyList());
     }
 
     @Test
     @PactTestFor(pactMethod = "allProductsNoAuthToken")
     void getAllProducts_whenNoAuth(MockServer mockServer) {
-        RestTemplate restTemplate = new RestTemplateBuilder()
-                .rootUri(mockServer.getUrl())
-                .build();
-
-        HttpClientErrorException e = assertThrows(HttpClientErrorException.class,
-                () -> new ProductService(restTemplate).getAllProducts());
-        assertEquals(401, e.getRawStatusCode());
+        assertHttpClientExceptionOn(() -> productService.getAllProducts(), 401);
     }
 
     @Test
     @PactTestFor(pactMethod = "getOneProduct")
     void getProductById_whenProductWithId10Exists(MockServer mockServer) {
-        Product expected = new Product();
-        expected.setId("10");
-        expected.setType("CREDIT_CARD");
-        expected.setName("28 Degrees");
-
-        RestTemplate restTemplate = new RestTemplateBuilder()
-                .rootUri(mockServer.getUrl())
+        val expected = Product.builder()
+                .id("10")
+                .type("CREDIT_CARD")
+                .name("28 Degrees")
                 .build();
-        Product product = new ProductService(restTemplate).getProduct("10");
-
-        assertEquals(expected, product);
+        val product = productService.getProduct("10");
+        assertThat(product).isEqualTo(expected);
     }
 
     @Test
     @PactTestFor(pactMethod = "productDoesNotExist")
     void getProductById_whenProductWithId11DoesNotExist(MockServer mockServer) {
-        RestTemplate restTemplate = new RestTemplateBuilder()
-                .rootUri(mockServer.getUrl())
-                .build();
-
-        HttpClientErrorException e = assertThrows(HttpClientErrorException.class,
-                () -> new ProductService(restTemplate).getProduct("11"));
-        assertEquals(404, e.getRawStatusCode());
+        assertHttpClientExceptionOn(() -> productService.getProduct("11"), 404);
     }
 
     @Test
     @PactTestFor(pactMethod = "singleProductnoAuthToken")
     void getProductById_whenNoAuth(MockServer mockServer) {
-        RestTemplate restTemplate = new RestTemplateBuilder()
-                .rootUri(mockServer.getUrl())
-                .build();
-
-        HttpClientErrorException e = assertThrows(HttpClientErrorException.class,
-                () -> new ProductService(restTemplate).getProduct("10"));
-        assertEquals(401, e.getRawStatusCode());
+        assertHttpClientExceptionOn(() -> productService.getProduct("10"), 401);
     }
 
     private Map<String, String> headers() {
-      Map<String, String> headers = new HashMap<>();
-      headers.put("Content-Type", "application/json; charset=utf-8");
-      return headers;
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json; charset=utf-8");
+        return headers;
+    }
+
+    private void assertHttpClientExceptionOn(ThrowableAssert.ThrowingCallable throwingCallable,
+                                             int expectedStatusCode) {
+        assertThatExceptionOfType(HttpClientErrorException.class)
+                .isThrownBy(throwingCallable)
+                .extracting(RestClientResponseException::getRawStatusCode)
+                .isEqualTo(expectedStatusCode);
     }
 }

@@ -5,15 +5,26 @@
   "interactions": [
     {
       "description": "get all products",
-      "providerState": "no products exist",
+      "providerStates": [
+        {
+          "name": "no products exist"
+        }
+      ],
       "request": {
         "headers": {
-          "Authorization": "Bearer 1994-10-01T22:38"
+          "Authorization": "Bearer 1988-02-24T20:26"
         },
         "matchingRules": {
-          "$.headers.Authorization": {
-            "match": "regex",
-            "regex": "Bearer (19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][1-9]|2[0123]):[0-5][0-9]"
+          "header": {
+            "Authorization": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "Bearer (19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][1-9]|2[0123]):[0-5][0-9]"
+                }
+              ]
+            }
           }
         },
         "method": "GET",
@@ -31,7 +42,11 @@
     },
     {
       "description": "get product by ID 10 with no auth token",
-      "providerState": "product with ID 10 exists",
+      "providerStates": [
+        {
+          "name": "product with ID 10 exists"
+        }
+      ],
       "request": {
         "method": "GET",
         "path": "/product/10"
@@ -42,15 +57,26 @@
     },
     {
       "description": "get product with ID 10",
-      "providerState": "product with ID 10 exists",
+      "providerStates": [
+        {
+          "name": "product with ID 10 exists"
+        }
+      ],
       "request": {
         "headers": {
-          "Authorization": "Bearer 1994-09-30T03:46"
+          "Authorization": "Bearer 1998-11-19T18:02"
         },
         "matchingRules": {
-          "$.headers.Authorization": {
-            "match": "regex",
-            "regex": "Bearer (19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][1-9]|2[0123]):[0-5][0-9]"
+          "header": {
+            "Authorization": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "Bearer (19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][1-9]|2[0123]):[0-5][0-9]"
+                }
+              ]
+            }
           }
         },
         "method": "GET",
@@ -66,14 +92,31 @@
           "Content-Type": "application/json; charset=utf-8"
         },
         "matchingRules": {
-          "$.body.id": {
-            "match": "type"
-          },
-          "$.body.name": {
-            "match": "type"
-          },
-          "$.body.type": {
-            "match": "type"
+          "body": {
+            "$.id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
           }
         },
         "status": 200
@@ -81,15 +124,26 @@
     },
     {
       "description": "get product with ID 11",
-      "providerState": "product with ID 11 does not exist",
+      "providerStates": [
+        {
+          "name": "product with ID 11 does not exist"
+        }
+      ],
       "request": {
         "headers": {
-          "Authorization": "Bearer 1901-10-22T11:55"
+          "Authorization": "Bearer 1937-07-30T22:21"
         },
         "matchingRules": {
-          "$.headers.Authorization": {
-            "match": "regex",
-            "regex": "Bearer (19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][1-9]|2[0123]):[0-5][0-9]"
+          "header": {
+            "Authorization": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "Bearer (19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][1-9]|2[0123]):[0-5][0-9]"
+                }
+              ]
+            }
           }
         },
         "method": "GET",
@@ -101,15 +155,26 @@
     },
     {
       "description": "get all products",
-      "providerState": "products exist",
+      "providerStates": [
+        {
+          "name": "products exist"
+        }
+      ],
       "request": {
         "headers": {
-          "Authorization": "Bearer 2089-10-06T12:39"
+          "Authorization": "Bearer 1998-10-31T13:38"
         },
         "matchingRules": {
-          "$.headers.Authorization": {
-            "match": "regex",
-            "regex": "Bearer (19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][1-9]|2[0123]):[0-5][0-9]"
+          "header": {
+            "Authorization": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "Bearer (19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][1-9]|2[0123]):[0-5][0-9]"
+                }
+              ]
+            }
           }
         },
         "method": "GET",
@@ -132,18 +197,40 @@
           "Content-Type": "application/json; charset=utf-8"
         },
         "matchingRules": {
-          "$.body": {
-            "match": "type",
-            "min": 2
-          },
-          "$.body[*].id": {
-            "match": "type"
-          },
-          "$.body[*].name": {
-            "match": "type"
-          },
-          "$.body[*].type": {
-            "match": "type"
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 2
+                }
+              ]
+            },
+            "$[*].id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[*].name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[*].type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
           }
         },
         "status": 200
@@ -151,7 +238,11 @@
     },
     {
       "description": "get all products with no auth token",
-      "providerState": "products exist",
+      "providerStates": [
+        {
+          "name": "products exist"
+        }
+      ],
       "request": {
         "method": "GET",
         "path": "/products"
@@ -166,7 +257,7 @@
       "version": "4.3.5"
     },
     "pactSpecification": {
-      "version": "2.0.0"
+      "version": "3.0.0"
     }
   },
   "provider": {
