@@ -13,12 +13,12 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class ProductService {
+public class ProductServiceClient {
 
     private final RestTemplate restTemplate;
 
     @Autowired
-    public ProductService(RestTemplate restTemplate) {
+    public ProductServiceClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
@@ -26,7 +26,8 @@ public class ProductService {
         return restTemplate.exchange("/products",
                 HttpMethod.GET,
                 getRequestEntity(),
-                new ParameterizedTypeReference<List<Product>>(){}).getBody();
+                new ParameterizedTypeReference<List<Product>>() {
+                }).getBody();
     }
 
     public Product getProduct(String id) {
@@ -43,6 +44,6 @@ public class ProductService {
     }
 
     private String generateAuthToken() {
-        return "Bearer " +  new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(new Date());
+        return "Bearer " + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(new Date());
     }
 }

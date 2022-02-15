@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 //)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ProductPactProviderTest {
+public class ProductProviderTest {
 
     @LocalServerPort
     int port;

@@ -29,17 +29,17 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith(PactConsumerTestExt.class)
 @PactTestFor(pactVersion = PactSpecVersion.V3)
-class ProductConsumerPactTest {
+class ProductConsumerTest {
 
     public static final String BEARER_REGEX = "Bearer (19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][1-9]|2[0123]):[0-5][0-9]";
-    private ProductService productService;
+    private ProductServiceClient productServiceClient;
 
     @BeforeEach
     public void init(MockServer mockServer) {
         RestTemplate restTemplate = new RestTemplateBuilder()
                 .rootUri(mockServer.getUrl())
                 .build();
-        productService = new ProductService(restTemplate);
+        productServiceClient = new ProductServiceClient(restTemplate);
     }
 
     @Pact(consumer = "FrontendApplication", provider = "ProductService")
@@ -136,7 +136,7 @@ class ProductConsumerPactTest {
                 .type("CREDIT_CARD")
                 .name("Gem Visa")
                 .build();
-        val products = productService.getAllProducts();
+        val products = productServiceClient.getAllProducts();
 
         assertThat(products).isEqualTo(Arrays.asList(product, product));
     }
@@ -144,14 +144,14 @@ class ProductConsumerPactTest {
     @Test
     @PactTestFor(pactMethod = "noProductsExist")
     void getAllProducts_whenNoProductsExist(MockServer mockServer) {
-        val products = productService.getAllProducts();
+        val products = productServiceClient.getAllProducts();
         assertThat(products).isEqualTo(Collections.emptyList());
     }
 
     @Test
     @PactTestFor(pactMethod = "allProductsNoAuthToken")
     void getAllProducts_whenNoAuth(MockServer mockServer) {
-        assertHttpClientExceptionOn(() -> productService.getAllProducts(), 401);
+        assertHttpClientExceptionOn(() -> productServiceClient.getAllProducts(), 401);
     }
 
     @Test
@@ -162,20 +162,20 @@ class ProductConsumerPactTest {
                 .type("CREDIT_CARD")
                 .name("28 Degrees")
                 .build();
-        val product = productService.getProduct("10");
+        val product = productServiceClient.getProduct("10");
         assertThat(product).isEqualTo(expected);
     }
 
     @Test
     @PactTestFor(pactMethod = "productDoesNotExist")
     void getProductById_whenProductWithId11DoesNotExist(MockServer mockServer) {
-        assertHttpClientExceptionOn(() -> productService.getProduct("11"), 404);
+        assertHttpClientExceptionOn(() -> productServiceClient.getProduct("11"), 404);
     }
 
     @Test
     @PactTestFor(pactMethod = "singleProductnoAuthToken")
     void getProductById_whenNoAuth(MockServer mockServer) {
-        assertHttpClientExceptionOn(() -> productService.getProduct("10"), 401);
+        assertHttpClientExceptionOn(() -> productServiceClient.getProduct("10"), 401);
     }
 
     private Map<String, String> headers() {
