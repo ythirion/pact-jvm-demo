@@ -1,0 +1,49 @@
+{
+  "consumer": {
+    "name": "messageListener"
+  },
+  "messages": [
+    {
+      "contents": {
+        "id": "10",
+        "type": "CREDIT_CARD"
+      },
+      "description": "a product creation event",
+      "matchingRules": {
+        "body": {
+          "$.id": {
+            "combine": "AND",
+            "matchers": [
+              {
+                "match": "type"
+              }
+            ]
+          },
+          "$.type": {
+            "combine": "AND",
+            "matchers": [
+              {
+                "match": "type"
+              }
+            ]
+          }
+        }
+      },
+      "metaData": {
+        "contentType": "application/json",
+        "key": "newProducts"
+      }
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.3.5"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "ProductService"
+  }
+}

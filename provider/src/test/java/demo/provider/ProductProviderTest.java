@@ -24,7 +24,7 @@ import java.util.Optional;
 import static org.mockito.Mockito.when;
 
 @Provider("ProductService")
-@PactFolder("src/test/pacts")
+@PactFolder("src/test/pacts-http")
 //@PactBroker(
 //        host = "localhost",
 //        port = "8000",
@@ -41,7 +41,7 @@ public class ProductProviderTest {
     private ProductRepository productRepository;
 
     @BeforeEach
-    void setUp(PactVerificationContext context) {
+    void init(PactVerificationContext context) {
         context.setTarget(new HttpTestTarget("localhost", port));
     }
 

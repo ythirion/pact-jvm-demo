@@ -5,13 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-class Product {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProductCreated {
+    private UUID messageId;
     private String id;
     private String type;
-    private String name;
-    private String version;
 }
