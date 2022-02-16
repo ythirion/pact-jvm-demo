@@ -68,7 +68,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${parent.basedir}/target/pacts</outputDirectory>
+                            <outputDirectory>${parent.basedir}/pacts</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/target/pacts</directory>

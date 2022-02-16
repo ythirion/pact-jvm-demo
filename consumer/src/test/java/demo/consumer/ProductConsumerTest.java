@@ -98,7 +98,12 @@ class ProductConsumerTest {
     @PactTestFor(pactMethod = "getAllProductsWithMatchers")
     void getAllProducts_whenProductsExist_withMatchers(MockServer mockServer) {
         val products = productServiceClient.getAllProducts();
-        assertThat(products).isNotNull();
+        assertThat(products).hasSizeGreaterThanOrEqualTo(1);
+        assertThat(products).allSatisfy(product -> {
+            assertThat(product.getId()).matches("[0-9]{2}");
+            assertThat(product.getType()).isNotBlank();
+            assertThat(product.getType()).isNotBlank();
+        });
     }
 
     @Pact(consumer = "FrontendApplication", provider = "ProductService")
