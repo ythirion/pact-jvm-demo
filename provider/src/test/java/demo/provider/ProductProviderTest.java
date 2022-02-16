@@ -2,10 +2,11 @@ package demo.provider;
 
 import au.com.dius.pact.provider.junit5.HttpTestTarget;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
-import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
+import au.com.dius.pact.provider.junitsupport.Consumer;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactFolder;
+import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider;
 import org.apache.hc.core5.http.HttpRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
@@ -24,14 +25,12 @@ import java.util.Optional;
 import static org.mockito.Mockito.when;
 
 @Provider("ProductService")
-@PactFolder("src/test/pacts-http")
-//@PactBroker(
-//        host = "localhost",
-//        port = "8000",
-//        authentication = @PactBrokerAuth(username = "pact_workshop", password = "pact_workshop")
-//)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+// Limit the scope of your pact -> Only contract between FrontendApplication - ProductService
+@Consumer("FrontendApplication")
+@PactFolder("src/test/pacts-http")
+//@PactBroker
 public class ProductProviderTest {
 
     @LocalServerPort
@@ -43,11 +42,14 @@ public class ProductProviderTest {
     @BeforeEach
     void init(PactVerificationContext context) {
         context.setTarget(new HttpTestTarget("localhost", port));
+        // If you want to force the publishResults from JUnit launcher
+        //System.setProperty("pact.verifier.publishResults", "true");
     }
 
     @TestTemplate
-    @ExtendWith(PactVerificationInvocationContextProvider.class)
-    void verifyPact(PactVerificationContext context, HttpRequest request) {
+    // Enable Pact to get system properties from application.yaml file
+    @ExtendWith(PactVerificationSpringProvider.class)
+    void pactVerificationTestTemplate(PactVerificationContext context, HttpRequest request) {
         replaceAuthHeader(request);
         context.verifyInteraction();
     }

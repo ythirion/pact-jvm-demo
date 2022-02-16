@@ -9,6 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <pact.provider.version>4.3.5</pact.provider.version>
+        <mvn-surefire-plugin.version>2.22.2</mvn-surefire-plugin.version>
+        <revision>1.0.0</revision>
+    </properties>
+
     <artifactId>provider</artifactId>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
@@ -30,12 +38,41 @@
             </exclusions>
             <scope>test</scope>
         </dependency>
+        <!-- Enable Pact to get system properties from application.yaml file in a junit5 context -->
+        <dependency>
+            <groupId>au.com.dius.pact.provider</groupId>
+            <artifactId>junit5spring</artifactId>
+            <version>4.3.4</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
-    <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <pact.provider.version>4.3.5</pact.provider.version>
-    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${mvn-surefire-plugin.version}</version>
+                <configuration>
+                    <systemProperties>
+                        <pact.provider.version>${revision}</pact.provider.version>
+                        <pact.verifier.publishResults>true</pact.verifier.publishResults>
+                    </systemProperties>
+                    <!-- https://docs.pact.io/implementation_guides/jvm/provider/junit5/#-important-note-for-maven-users- -->
+                    <useSystemClassLoader>false</useSystemClassLoader>
+                </configuration>
+            </plugin>
 
+            <!-- to be able to publish manually pacts to a pact broker -->
+            <plugin>
+                <groupId>au.com.dius.pact.provider</groupId>
+                <artifactId>maven</artifactId>
+                <version>4.1.11</version>
+                <configuration>
+                    <pactBrokerUrl>https://toto.pactflow.io</pactBrokerUrl>
+                    <pactBrokerToken>uy-JtKVTSv5npRYZrIlv6g</pactBrokerToken>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

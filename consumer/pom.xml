@@ -16,6 +16,8 @@
         <maven.compiler.target>11</maven.compiler.target>
         <pact.consumer.version>4.3.5</pact.consumer.version>
         <assertj.version>3.22.0</assertj.version>
+        <mvn-surefire-plugin.version>2.22.2</mvn-surefire-plugin.version>
+        <revision>1.0.0</revision>
     </properties>
 
     <dependencies>
@@ -25,12 +27,23 @@
             <version>${assertj.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>au.com.dius.pact.consumer</groupId>
             <artifactId>junit5</artifactId>
             <version>${pact.consumer.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>au.com.dius.pact.provider</groupId>
+            <artifactId>junit5spring</artifactId>
+            <version>4.3.4</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -76,6 +89,16 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- to be able to publish manually pacts to a pact broker -->
+            <plugin>
+                <groupId>au.com.dius.pact.provider</groupId>
+                <artifactId>maven</artifactId>
+                <version>4.1.11</version>
+                <configuration>
+                    <pactBrokerUrl>https://toto.pactflow.io</pactBrokerUrl>
+                    <pactBrokerToken>uy-JtKVTSv5npRYZrIlv6g</pactBrokerToken>
+                </configuration>
             </plugin>
         </plugins>
     </build>
