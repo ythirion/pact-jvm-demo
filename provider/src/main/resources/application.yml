@@ -6,6 +6,6 @@ server:
       force: true
 
 pactbroker:
-  url: https://toto.pactflow.io
+  url: <your pact broker url>
   auth:
-    token: uy-JtKVTSv5npRYZrIlv6g
+    token: <auth token>
