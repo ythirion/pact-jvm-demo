@@ -62,6 +62,45 @@ class ProductConsumerTest {
                 .toPact();
     }
 
+    @Test
+    @PactTestFor(pactMethod = "getAllProducts")
+    void getAllProducts_whenProductsExist(MockServer mockServer) {
+        val product = Product.builder()
+                .id("09")
+                .type("CREDIT_CARD")
+                .name("Gem Visa")
+                .build();
+        val products = productServiceClient.getAllProducts();
+
+        assertThat(products).isEqualTo(Arrays.asList(product, product));
+    }
+
+    @Pact(consumer = "FrontendApplication", provider = "ProductService")
+    RequestResponsePact getAllProductsWithMatchers(PactDslWithProvider builder) {
+        return builder.given("products exist")
+                .uponReceiving("get all products with matchers")
+                .method("GET")
+                .path("/products")
+                .matchHeader("Authorization", BEARER_REGEX)
+                .willRespondWith()
+                .status(200)
+                .headers(headers())
+                .body(newJsonArrayMinLike(1, array ->
+                        array.object(object ->
+                                object.stringMatcher("id", "[0-9]{2}")
+                                        .stringType("type")
+                                        .stringType("name"))
+                ).build())
+                .toPact();
+    }
+
+    @Test
+    @PactTestFor(pactMethod = "getAllProductsWithMatchers")
+    void getAllProducts_whenProductsExist_withMatchers(MockServer mockServer) {
+        val products = productServiceClient.getAllProducts();
+        assertThat(products).isNotNull();
+    }
+
     @Pact(consumer = "FrontendApplication", provider = "ProductService")
     RequestResponsePact noProductsExist(PactDslWithProvider builder) {
         return builder.given("no products exist")
@@ -76,6 +115,13 @@ class ProductConsumerTest {
                 .toPact();
     }
 
+    @Test
+    @PactTestFor(pactMethod = "noProductsExist")
+    void getAllProducts_whenNoProductsExist(MockServer mockServer) {
+        val products = productServiceClient.getAllProducts();
+        assertThat(products).isEqualTo(Collections.emptyList());
+    }
+
     @Pact(consumer = "FrontendApplication", provider = "ProductService")
     RequestResponsePact allProductsNoAuthToken(PactDslWithProvider builder) {
         return builder.given("products exist")
@@ -85,6 +131,12 @@ class ProductConsumerTest {
                 .willRespondWith()
                 .status(401)
                 .toPact();
+    }
+
+    @Test
+    @PactTestFor(pactMethod = "allProductsNoAuthToken")
+    void getAllProducts_whenNoAuth(MockServer mockServer) {
+        assertHttpClientExceptionOn(() -> productServiceClient.getAllProducts(), 401);
     }
 
     @Pact(consumer = "FrontendApplication", provider = "ProductService")
@@ -105,55 +157,6 @@ class ProductConsumerTest {
                 .toPact();
     }
 
-    @Pact(consumer = "FrontendApplication", provider = "ProductService")
-    RequestResponsePact productDoesNotExist(PactDslWithProvider builder) {
-        return builder.given("product with ID 11 does not exist")
-                .uponReceiving("get product with ID 11")
-                .method("GET")
-                .path("/product/11")
-                .matchHeader("Authorization", BEARER_REGEX)
-                .willRespondWith()
-                .status(404)
-                .toPact();
-    }
-
-    @Pact(consumer = "FrontendApplication", provider = "ProductService")
-    RequestResponsePact singleProductnoAuthToken(PactDslWithProvider builder) {
-        return builder.given("product with ID 10 exists")
-                .uponReceiving("get product by ID 10 with no auth token")
-                .method("GET")
-                .path("/product/10")
-                .willRespondWith()
-                .status(401)
-                .toPact();
-    }
-
-    @Test
-    @PactTestFor(pactMethod = "getAllProducts")
-    void getAllProducts_whenProductsExist(MockServer mockServer) {
-        val product = Product.builder()
-                .id("09")
-                .type("CREDIT_CARD")
-                .name("Gem Visa")
-                .build();
-        val products = productServiceClient.getAllProducts();
-
-        assertThat(products).isEqualTo(Arrays.asList(product, product));
-    }
-
-    @Test
-    @PactTestFor(pactMethod = "noProductsExist")
-    void getAllProducts_whenNoProductsExist(MockServer mockServer) {
-        val products = productServiceClient.getAllProducts();
-        assertThat(products).isEqualTo(Collections.emptyList());
-    }
-
-    @Test
-    @PactTestFor(pactMethod = "allProductsNoAuthToken")
-    void getAllProducts_whenNoAuth(MockServer mockServer) {
-        assertHttpClientExceptionOn(() -> productServiceClient.getAllProducts(), 401);
-    }
-
     @Test
     @PactTestFor(pactMethod = "getOneProduct")
     void getProductById_whenProductWithId10Exists(MockServer mockServer) {
@@ -166,10 +169,33 @@ class ProductConsumerTest {
         assertThat(product).isEqualTo(expected);
     }
 
+    @Pact(consumer = "FrontendApplication", provider = "ProductService")
+    RequestResponsePact productDoesNotExist(PactDslWithProvider builder) {
+        return builder.given("product with ID 11 does not exist")
+                .uponReceiving("get product with ID 11")
+                .method("GET")
+                .path("/product/11")
+                .matchHeader("Authorization", BEARER_REGEX)
+                .willRespondWith()
+                .status(404)
+                .toPact();
+    }
+
     @Test
     @PactTestFor(pactMethod = "productDoesNotExist")
     void getProductById_whenProductWithId11DoesNotExist(MockServer mockServer) {
         assertHttpClientExceptionOn(() -> productServiceClient.getProduct("11"), 404);
+    }
+
+    @Pact(consumer = "FrontendApplication", provider = "ProductService")
+    RequestResponsePact singleProductnoAuthToken(PactDslWithProvider builder) {
+        return builder.given("product with ID 10 exists")
+                .uponReceiving("get product by ID 10 with no auth token")
+                .method("GET")
+                .path("/product/10")
+                .willRespondWith()
+                .status(401)
+                .toPact();
     }
 
     @Test

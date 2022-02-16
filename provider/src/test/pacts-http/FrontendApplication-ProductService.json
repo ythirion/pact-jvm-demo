@@ -12,7 +12,7 @@
       ],
       "request": {
         "headers": {
-          "Authorization": "Bearer 1926-12-31T21:09"
+          "Authorization": "Bearer 1944-11-30T23:08"
         },
         "matchingRules": {
           "header": {
@@ -32,7 +32,6 @@
       },
       "response": {
         "body": [
-
         ],
         "headers": {
           "Content-Type": "application/json; charset=utf-8"
@@ -64,7 +63,7 @@
       ],
       "request": {
         "headers": {
-          "Authorization": "Bearer 2038-10-25T20:31"
+          "Authorization": "Bearer 2066-11-31T22:52"
         },
         "matchingRules": {
           "header": {
@@ -131,7 +130,7 @@
       ],
       "request": {
         "headers": {
-          "Authorization": "Bearer 1985-08-02T06:16"
+          "Authorization": "Bearer 1982-11-07T16:24"
         },
         "matchingRules": {
           "header": {
@@ -162,7 +161,7 @@
       ],
       "request": {
         "headers": {
-          "Authorization": "Bearer 1989-07-12T17:49"
+          "Authorization": "Bearer 1968-10-08T20:27"
         },
         "matchingRules": {
           "header": {
@@ -212,6 +211,101 @@
               "matchers": [
                 {
                   "match": "type"
+                }
+              ]
+            },
+            "$[*].name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[*].type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "get all products with matchers",
+      "providerStates": [
+        {
+          "name": "products exist"
+        }
+      ],
+      "request": {
+        "headers": {
+          "Authorization": "Bearer 1988-05-30T16:28"
+        },
+        "matchingRules": {
+          "header": {
+            "Authorization": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "Bearer (19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][1-9]|2[0123]):[0-5][0-9]"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/products"
+      },
+      "response": {
+        "body": [
+          {
+            "id": "28",
+            "name": "string",
+            "type": "string"
+          }
+        ],
+        "generators": {
+          "body": {
+            "$[*].id": {
+              "regex": "[0-9]{2}",
+              "type": "Regex"
+            },
+            "$[*].name": {
+              "size": 20,
+              "type": "RandomString"
+            },
+            "$[*].type": {
+              "size": 20,
+              "type": "RandomString"
+            }
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "matchingRules": {
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$[*].id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "[0-9]{2}"
                 }
               ]
             },

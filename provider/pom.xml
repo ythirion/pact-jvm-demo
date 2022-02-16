@@ -19,7 +19,6 @@
 
     <artifactId>provider</artifactId>
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -30,20 +29,7 @@
             <groupId>au.com.dius.pact.provider</groupId>
             <artifactId>junit5</artifactId>
             <version>${pact.provider.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.vintage</groupId>
-                    <artifactId>junit-vintage-engine</artifactId>
-                </exclusion>
-            </exclusions>
             <scope>test</scope>
-        </dependency>
-        <!-- Enable Pact to get system properties from application.yaml file in a junit5 context -->
-        <dependency>
-            <groupId>au.com.dius.pact.provider</groupId>
-            <artifactId>junit5spring</artifactId>
-            <version>4.3.4</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -69,8 +55,8 @@
                 <artifactId>maven</artifactId>
                 <version>4.1.11</version>
                 <configuration>
-                    <pactBrokerUrl>https://toto.pactflow.io</pactBrokerUrl>
-                    <pactBrokerToken>uy-JtKVTSv5npRYZrIlv6g</pactBrokerToken>
+                    <pactBrokerUrl>yourPactUrl</pactBrokerUrl>
+                    <pactBrokerToken>yourToken</pactBrokerToken>
                 </configuration>
             </plugin>
         </plugins>
