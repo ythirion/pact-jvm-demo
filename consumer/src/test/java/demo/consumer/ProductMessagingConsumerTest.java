@@ -20,14 +20,15 @@ import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(PactConsumerTestExt.class)
-@PactTestFor(providerType = ProviderType.ASYNCH, pactVersion = PactSpecVersion.V3)
+@PactTestFor(providerType = ProviderType.ASYNCH, pactVersion = PactSpecVersion.V3, providerName = "ProductService")
 class ProductMessagingConsumerTest {
     private final ObjectMapper mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private final static String CONSUMER = "messageListener";
 
     private final ProductCreatedHandler productCreatedHandler = new ProductCreatedHandler(mapper);
 
-    @Pact(consumer = "messageListener", provider = "ProductService")
+    @Pact(consumer = CONSUMER)
     MessagePact publishNewProductCreated(MessagePactBuilder builder) {
         return builder
                 .hasPactWith("ProductService")
@@ -45,6 +46,7 @@ class ProductMessagingConsumerTest {
     @PactTestFor(pactMethod = "publishNewProductCreated")
     void receive_a_product_created_message(List<Message> messages) {
         assertThat(messages)
+                .isNotEmpty()
                 .allSatisfy(message -> {
                     val event = productCreatedHandler.handle(message.contentsAsString());
                     assertThat(event.getId()).isEqualTo("10");

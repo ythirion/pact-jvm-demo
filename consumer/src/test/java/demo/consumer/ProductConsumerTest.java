@@ -28,10 +28,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith(PactConsumerTestExt.class)
-@PactTestFor(pactVersion = PactSpecVersion.V3)
+@PactTestFor(pactVersion = PactSpecVersion.V3, providerName = "ProductService")
 class ProductConsumerTest {
 
     public static final String BEARER_REGEX = "Bearer (19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][1-9]|2[0123]):[0-5][0-9]";
+    private static final String CONSUMER = "FrontendApplication";
     private ProductServiceClient productServiceClient;
 
     @BeforeEach
@@ -42,7 +43,7 @@ class ProductConsumerTest {
         productServiceClient = new ProductServiceClient(restTemplate);
     }
 
-    @Pact(consumer = "FrontendApplication", provider = "ProductService")
+    @Pact(consumer = CONSUMER)
     RequestResponsePact getAllProducts(PactDslWithProvider builder) {
         return builder.given("products exist")
                 .uponReceiving("get all products")
@@ -75,7 +76,7 @@ class ProductConsumerTest {
         assertThat(products).isEqualTo(Arrays.asList(product, product));
     }
 
-    @Pact(consumer = "FrontendApplication", provider = "ProductService")
+    @Pact(consumer = CONSUMER)
     RequestResponsePact getAllProductsWithMatchers(PactDslWithProvider builder) {
         return builder.given("products exist")
                 .uponReceiving("get all products with matchers")
@@ -98,15 +99,16 @@ class ProductConsumerTest {
     @PactTestFor(pactMethod = "getAllProductsWithMatchers")
     void getAllProducts_whenProductsExist_withMatchers(MockServer mockServer) {
         val products = productServiceClient.getAllProducts();
-        assertThat(products).hasSizeGreaterThanOrEqualTo(1);
-        assertThat(products).allSatisfy(product -> {
-            assertThat(product.getId()).matches("[0-9]{2}");
-            assertThat(product.getType()).isNotBlank();
-            assertThat(product.getType()).isNotBlank();
-        });
+        assertThat(products)
+                .hasSizeGreaterThanOrEqualTo(1)
+                .allSatisfy(product -> {
+                    assertThat(product.getId()).matches("[0-9]{2}");
+                    assertThat(product.getType()).isNotBlank();
+                    assertThat(product.getType()).isNotBlank();
+                });
     }
 
-    @Pact(consumer = "FrontendApplication", provider = "ProductService")
+    @Pact(consumer = CONSUMER)
     RequestResponsePact noProductsExist(PactDslWithProvider builder) {
         return builder.given("no products exist")
                 .uponReceiving("get all products")
@@ -127,7 +129,7 @@ class ProductConsumerTest {
         assertThat(products).isEqualTo(Collections.emptyList());
     }
 
-    @Pact(consumer = "FrontendApplication", provider = "ProductService")
+    @Pact(consumer = CONSUMER)
     RequestResponsePact allProductsNoAuthToken(PactDslWithProvider builder) {
         return builder.given("products exist")
                 .uponReceiving("get all products with no auth token")
@@ -144,7 +146,7 @@ class ProductConsumerTest {
         assertHttpClientExceptionOn(() -> productServiceClient.getAllProducts(), 401);
     }
 
-    @Pact(consumer = "FrontendApplication", provider = "ProductService")
+    @Pact(consumer = CONSUMER)
     RequestResponsePact getOneProduct(PactDslWithProvider builder) {
         return builder.given("product with ID 10 exists")
                 .uponReceiving("get product with ID 10")
@@ -174,7 +176,7 @@ class ProductConsumerTest {
         assertThat(product).isEqualTo(expected);
     }
 
-    @Pact(consumer = "FrontendApplication", provider = "ProductService")
+    @Pact(consumer = CONSUMER)
     RequestResponsePact productDoesNotExist(PactDslWithProvider builder) {
         return builder.given("product with ID 11 does not exist")
                 .uponReceiving("get product with ID 11")
@@ -192,7 +194,7 @@ class ProductConsumerTest {
         assertHttpClientExceptionOn(() -> productServiceClient.getProduct("11"), 404);
     }
 
-    @Pact(consumer = "FrontendApplication", provider = "ProductService")
+    @Pact(consumer = CONSUMER)
     RequestResponsePact singleProductnoAuthToken(PactDslWithProvider builder) {
         return builder.given("product with ID 10 exists")
                 .uponReceiving("get product by ID 10 with no auth token")
